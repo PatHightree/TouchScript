@@ -36,7 +36,6 @@ namespace TouchScript.InputSources {
 			
 			for (var i = 0; i < Input.touchCount; ++i) {
 	     		var t = Input.GetTouch(i);
-				Debug.Log(t.position + " " + t.phase);
 				
 				switch (t.phase) {
 				case TouchPhase.Began:
@@ -49,17 +48,13 @@ namespace TouchScript.InputSources {
 						touchIds.Add(t.fingerId);
 						int id = beginTouch(t.position);
 						touchStates.Add(t.fingerId, new TouchState(id, t.phase, t.position));												
-						
-						Debug.Log(String.Format("Began: fingerId: {0} touchScriptId: {1}", t.fingerId, id));
 					}					
 						break;
 				case TouchPhase.Moved:
 					if (touchIds.Contains(t.fingerId)) {
 						var ts = touchStates[t.fingerId];
 						touchStates[t.fingerId] = new TouchState(ts.Id, t.phase, t.position);
-						moveTouch(ts.Id, t.position);
-						
-						Debug.Log("MOVED");
+						moveTouch(ts.Id, t.position);						
 					} else {
 						//maybe we missed began phase
 						touchIds.Add(t.fingerId);
@@ -73,8 +68,6 @@ namespace TouchScript.InputSources {
 						touchIds.Remove(t.fingerId);
 						touchStates.Remove(t.fingerId);						
 						endTouch(ts.Id);
-						
-						Debug.Log("ENDED");
 					} else {
 						//maybe we totally missed one finger begin-end transition
 						int id = beginTouch(t.position);

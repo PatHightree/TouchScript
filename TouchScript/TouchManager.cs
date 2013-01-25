@@ -42,22 +42,51 @@ namespace TouchScript {
         /// <summary>
         /// Occurs when new touch points are added.
         /// </summary>
-        public event EventHandler<TouchEventArgs> TouchPointsAdded;
+        /// 
+        public event EventHandler<TouchEventArgs> TouchPointsAdded {
+			add {
+				touchPointsAddedInvoker += value;
+			}			
+			remove {
+				touchPointsAddedInvoker -= value;
+			}
+		}
 
         /// <summary>
         /// Occurs when touch points are updated.
         /// </summary>
-        public event EventHandler<TouchEventArgs> TouchPointsUpdated;
+        public event EventHandler<TouchEventArgs> TouchPointsUpdated {
+			add {
+				touchPointsUpdatedInvoker += value;
+			}			
+			remove {
+				touchPointsUpdatedInvoker -= value;
+			}
+		}
 
         /// <summary>
         /// Occurs when touch points are removed.
         /// </summary>
-        public event EventHandler<TouchEventArgs> TouchPointsRemoved;
+        public event EventHandler<TouchEventArgs> TouchPointsRemoved {
+			add {
+				touchPointsRemovedInvoker += value;
+			}			
+			remove {
+				touchPointsRemovedInvoker -= value;
+			}
+		}
 
         /// <summary>
         /// Occurs when touch points are cancelled.
         /// </summary>
-        public event EventHandler<TouchEventArgs> TouchPointsCancelled;
+        public event EventHandler<TouchEventArgs> TouchPointsCancelled {
+			add {
+				touchPointsCancelledInvoker += value;
+			}			
+			remove {
+				touchPointsCancelledInvoker -= value;
+			}
+		}
 
         #endregion
 
@@ -129,6 +158,10 @@ namespace TouchScript {
         private readonly object sync = new object();
 
         private int nextTouchPointId = 0;
+		
+		// Weird iOS Events AOT Bug hack
+		private EventHandler<TouchEventArgs> touchPointsAddedInvoker, touchPointsUpdatedInvoker, 
+											 touchPointsRemovedInvoker, touchPointsCancelledInvoker;
 
         #endregion
 
@@ -397,7 +430,7 @@ namespace TouchScript {
                     if (gestureIsActive(gesture)) gesture.TouchesBegan(valuePair.Value);
                 }
 
-                if (TouchPointsAdded != null) TouchPointsAdded(this, new TouchEventArgs(new List<TouchPoint>(touchesBegan)));
+                if (touchPointsAddedInvoker != null) touchPointsAddedInvoker(this, new TouchEventArgs(new List<TouchPoint>(touchesBegan)));
                 touchesBegan.Clear();
 
                 return true;
@@ -455,7 +488,7 @@ namespace TouchScript {
                         if (gestureIsActive(gesture)) gesture.TouchesMoved(valuePair.Value);
                     }
 
-                    if (TouchPointsUpdated != null) TouchPointsUpdated(this, new TouchEventArgs(new List<TouchPoint>(reallyMoved)));
+                    if (touchPointsUpdatedInvoker != null) touchPointsUpdatedInvoker(this, new TouchEventArgs(new List<TouchPoint>(reallyMoved)));
                 }
                 touchesMoved.Clear();
 
@@ -503,7 +536,7 @@ namespace TouchScript {
                     if (gestureIsActive(gesture)) gesture.TouchesEnded(valuePair.Value);
                 }
 
-                if (TouchPointsRemoved != null) TouchPointsRemoved(this, new TouchEventArgs(new List<TouchPoint>(touchesEnded)));
+                if (touchPointsRemovedInvoker != null) touchPointsRemovedInvoker(this, new TouchEventArgs(new List<TouchPoint>(touchesEnded)));
                 touchesEnded.Clear();
 
                 return true;
@@ -549,7 +582,7 @@ namespace TouchScript {
                     valuePair.Key.TouchesCancelled(valuePair.Value);
                 }
 
-                if (TouchPointsCancelled != null) TouchPointsCancelled(this, new TouchEventArgs(new List<TouchPoint>(touchesCancelled)));
+                if (touchPointsCancelledInvoker != null) touchPointsCancelledInvoker(this, new TouchEventArgs(new List<TouchPoint>(touchesCancelled)));
                 touchesCancelled.Clear();
 
                 return true;
